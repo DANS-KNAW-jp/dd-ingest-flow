@@ -174,7 +174,6 @@ public class DepositToDvDatasetMetadataMapper {
             citationFields.addSeries(getMetadataDescriptions(ddm)
                 .filter(Description::isNotBlank)
                 .filter(Description::isSeriesInformation)
-                .map(Node::getTextContent)
             );
 
         }

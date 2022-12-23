@@ -167,6 +167,9 @@ class MappingIntegrationTest {
         assertThat(field.getValue())
             .extracting(SERIES_NAME)
             .extracting("value")
-            .containsOnly("collection 123");
+            .containsOnly("series 123");
+        // TODO https://archaeology.datastations.nl/api/datasets/export?exporter=dataverse_json&persistentId=doi%3A10.17026/AR/ZNN3KJ
+        //  has {"typeName":"series","multiple":false,"typeClass":"compound","value":{"seriesName":{"typeName":"seriesName","multiple":false,"typeClass":"primitive","value":"ADC rapport 5882"}}}
+        //  we get [] around {"seriesName"...}
     }
 }

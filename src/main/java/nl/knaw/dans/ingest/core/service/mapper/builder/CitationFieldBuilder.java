@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.ingest.core.service.mapper.builder;
 
-import nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames;
+import nl.knaw.dans.lib.dataverse.model.dataset.PrimitiveSingleValueField;
 import nl.knaw.dans.lib.dataverse.model.user.AuthenticatedUser;
 import org.w3c.dom.Node;
 
@@ -39,6 +39,7 @@ import static nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames.OTHER_ID
 import static nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames.PRODUCTION_DATE;
 import static nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames.PUBLICATION;
 import static nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames.SERIES;
+import static nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames.SERIES_NAME;
 import static nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames.SUBJECT;
 import static nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames.TITLE;
 
@@ -48,8 +49,9 @@ public class CitationFieldBuilder extends FieldBuilder {
         addSingleString(TITLE, nodes);
     }
 
-    public void addSeries(Stream<String> nodes) {
-        addSingleString(SERIES, nodes);
+    public void addSeries(Stream<Node> nodes) {
+        getCompoundBuilder(SERIES, false)
+            .addSubfield(SERIES_NAME, nodes.findFirst().orElseThrow().getTextContent());
     }
 
     public void addOtherIds(Stream<Node> stream, CompoundFieldGenerator<Node> generator) {
