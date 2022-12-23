@@ -142,4 +142,31 @@ class MappingIntegrationTest {
             .extracting("value")
             .containsOnly("<p>Lorem ipsum.</p>", "<p>technical description</p>");
     }
+
+    @Test
+    void DD_1216_description_type_series_information_maps_once_to_series() throws Exception {
+        var doc = readDocumentFromString(
+            "<ddm:DDM xmlns:ddm=\"http://easy.dans.knaw.nl/schemas/md/ddm/\"\n"
+                + "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                + "         xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
+                + "         xmlns:dct=\"http://purl.org/dc/terms/\"\n"
+                + "         xsi:schemaLocation=\"http://easy.dans.knaw.nl/schemas/md/ddm/ http://easy.dans.knaw.nl/schemas/md/2017/09/ddm.xsd\">\n"
+                + ddmProfile
+                + "    <ddm:dcmiMetadata>\n"
+                + "        <dct:rightsHolder>Mr. Rights</dct:rightsHolder>\n"
+                + "        <dct:description descriptionType=\"SeriesInformation\">series 123</dct:description>\n"
+                + "    </ddm:dcmiMetadata>\n"
+                + "</ddm:DDM>\n");
+
+        var result = mapDdmToDataset(doc);
+        var str = toJsonString(result);
+        assertEquals(2, str.split("series 123").length);
+        var field = (CompoundField) result.getDatasetVersion().getMetadataBlocks()
+            .get("citation").getFields().stream()
+            .filter(f -> f.getTypeName().equals(SERIES)).findFirst().orElseThrow();
+        assertThat(field.getValue())
+            .extracting(SERIES_NAME)
+            .extracting("value")
+            .containsOnly("collection 123");
+    }
 }

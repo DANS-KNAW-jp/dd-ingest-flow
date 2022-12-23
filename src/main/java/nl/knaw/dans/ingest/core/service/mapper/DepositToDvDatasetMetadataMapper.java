@@ -171,6 +171,12 @@ public class DepositToDvDatasetMetadataMapper {
             citationFields.addDateOfCollections(getDatesOfCollection(ddm)
                 .filter(DatesOfCollection::isValidDistributorDate), DatesOfCollection.toDistributorValueObject);
             citationFields.addDataSources(getDataSources(ddm));
+            citationFields.addSeries(getMetadataDescriptions(ddm)
+                .filter(Description::isNotBlank)
+                .filter(Description::isSeriesInformation)
+                .map(Node::getTextContent)
+            );
+
         }
         else {
             throw new IllegalStateException("Metadatablock citation should always be active");
