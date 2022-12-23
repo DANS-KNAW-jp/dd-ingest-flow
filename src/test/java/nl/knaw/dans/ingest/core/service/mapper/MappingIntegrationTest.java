@@ -159,7 +159,12 @@ class MappingIntegrationTest {
                 + "</ddm:DDM>\n");
 
         var result = mapDdmToDataset(doc);
+
+        // TODO
+        //  compare with https://archaeology.datastations.nl/api/datasets/export?exporter=dataverse_json&persistentId=doi%3A10.17026/AR/ZNN3KJ
+        //  despite multiple==false we get []
         var str = toJsonString(result);
+
         assertEquals(2, str.split("series 123").length);
         var field = (CompoundField) result.getDatasetVersion().getMetadataBlocks()
             .get("citation").getFields().stream()
@@ -168,8 +173,5 @@ class MappingIntegrationTest {
             .extracting(SERIES_NAME)
             .extracting("value")
             .containsOnly("series 123");
-        // TODO https://archaeology.datastations.nl/api/datasets/export?exporter=dataverse_json&persistentId=doi%3A10.17026/AR/ZNN3KJ
-        //  has {"typeName":"series","multiple":false,"typeClass":"compound","value":{"seriesName":{"typeName":"seriesName","multiple":false,"typeClass":"primitive","value":"ADC rapport 5882"}}}
-        //  we get [] around {"seriesName"...}
     }
 }
