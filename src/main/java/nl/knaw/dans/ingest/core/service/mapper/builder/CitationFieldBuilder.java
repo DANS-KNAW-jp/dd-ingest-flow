@@ -15,10 +15,10 @@
  */
 package nl.knaw.dans.ingest.core.service.mapper.builder;
 
-import nl.knaw.dans.lib.dataverse.model.dataset.PrimitiveSingleValueField;
 import nl.knaw.dans.lib.dataverse.model.user.AuthenticatedUser;
 import org.w3c.dom.Node;
 
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -50,8 +50,10 @@ public class CitationFieldBuilder extends FieldBuilder {
     }
 
     public void addSeries(Stream<Node> nodes) {
-        getCompoundBuilder(SERIES, false)
-            .addSubfield(SERIES_NAME, nodes.findFirst().orElseThrow().getTextContent());
+        Optional<Node> first = nodes.findFirst();
+        if(first.isPresent())
+            getCompoundBuilder(SERIES, false)
+                .addSubfield(SERIES_NAME, first.orElseThrow().getTextContent());
     }
 
     public void addOtherIds(Stream<Node> stream, CompoundFieldGenerator<Node> generator) {

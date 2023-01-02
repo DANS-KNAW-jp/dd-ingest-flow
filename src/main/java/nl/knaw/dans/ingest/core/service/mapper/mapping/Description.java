@@ -74,8 +74,7 @@ public class Description extends Base {
     }
 
     public static boolean isSeriesInformation(Node node) {
-        boolean b = hasAttributeValue(node, "descriptionType", "SeriesInformation");
-        return b;
+        return hasAttributeValue(node, "descriptionType", "SeriesInformation");
     }
 
     public static boolean hasDescriptionTypeOther(Node node) {
