@@ -160,9 +160,10 @@ class MappingIntegrationTest {
 
         var result = mapDdmToDataset(doc);
 
-        // TODO
-        //  compare with https://archaeology.datastations.nl/api/datasets/export?exporter=dataverse_json&persistentId=doi%3A10.17026/AR/ZNN3KJ
-        //  despite multiple==false we get []
+        // TODO unlike manual input (e.g. doi:10.17026/AR/GJHIXM) this produces square brackets
+        //  {"typeClass" : "compound", "typeName" : "series", "multiple" : false, "value" :
+        //  [ {"seriesName" : {"typeClass" : "primitive", "typeName" : "seriesName", "multiple" : false, "value" : "series 123"}} ]
+        //  }
         var str = toJsonString(result);
 
         assertEquals(2, str.split("series 123").length);
