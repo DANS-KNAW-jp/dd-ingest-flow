@@ -16,11 +16,13 @@
 package nl.knaw.dans.ingest.core.service.mapper;
 
 import nl.knaw.dans.lib.dataverse.model.dataset.CompoundSingleValueField;
+import nl.knaw.dans.lib.dataverse.model.dataset.MetadataField;
 import nl.knaw.dans.lib.dataverse.model.dataset.SingleValueField;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames.ALTERNATIVE_TITLE;
 import static nl.knaw.dans.ingest.core.service.DepositDatasetFieldNames.CONTRIBUTOR;
@@ -72,29 +74,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CitationMetadataFromDcmiTest {
 
-    @Test
-    public void CIT002_CIT010_first_title_alternatives_and_the_rest() throws Exception {
-        var doc = readDocumentFromString(""
-            + "<ddm:DDM " + rootAttributes + ">"
-            + minimalDdmProfile() + dcmi(""
-            + "        <dct:title>title 1</dct:title>"
-            + "        <dct:title>title 2</dct:title>"
-            + "        <dct:alternative>alt title 1</dct:alternative>"
-            + "        <dct:alternative>alt title 2</dct:alternative>")
-            + "</ddm:DDM>");
-        var result = mapDdmToDataset(doc, true);
-
-        // CIT002 first of dcmi title/alternative
-        assertThat(getPrimitiveSingleValueField("citation", ALTERNATIVE_TITLE, result))
-            .isEqualTo("title 1");
-
-        // CIT010 rest of dcmi title/alternative
-        assertThat(getCompoundMultiValueField("citation", DESCRIPTION, result))
-            .extracting(DESCRIPTION_VALUE).extracting("value")
-            .containsExactlyInAnyOrder("<p>title 2</p>", "<p>alt title 1</p>", "<p>alt title 2</p>");
-    }
-    @Test
-    public void CIT002_alt_title_first() throws Exception {
+    @Test // CIT002 + CIT010 (alternative) titles
+    public void titles_before_alternative_should_map_first_to_alternative_rest_to_description() throws Exception {
         var doc = readDocumentFromString(""
             + "<ddm:DDM " + rootAttributes + ">"
             + minimalDdmProfile() + dcmi(""
@@ -152,8 +133,25 @@ public class CitationMetadataFromDcmiTest {
             .contains("10.12345/678");
     }
 
-    @Test
-    public void CIT008_contact() throws Exception {
+    @Test // CIT002A
+    public void other_id_from_vault_metadata_should_map_to_other_id() throws Exception {
+        var doc = readDocumentFromString(""
+            + "<ddm:DDM " + rootAttributes + ">"
+            + minimalDdmProfile() + dcmi("")
+            + "</ddm:DDM>");
+        var result = mapDdmToDataset(doc, true);
+        var field = getCompoundMultiValueField("citation", OTHER_ID, result);
+
+        // CIT002A from vault metadata
+        assertThat(field.stream().map(Map::keySet)).containsExactlyInAnyOrder(Set.of("title", OTHER_ID_AGENCY));
+        assertThat(field).extracting(OTHER_ID_AGENCY).extracting("value")
+            .contains("otherId");
+        assertThat(field).extracting(OTHER_ID_VALUE).extracting("value")
+            .contains("something");
+    }
+
+    @Test // CIT008
+    public void conatct_name_email_affiliation_of_amd_should_map_to_contact() throws Exception {
         var doc = readDocumentFromString(""
             + "<ddm:DDM " + rootAttributes + ">"
             + minimalDdmProfile() + dcmi("")
